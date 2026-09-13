@@ -9,30 +9,6 @@ const isConfigured =
   config.anonKey &&
   config.anonKey !== 'YOUR_ANON_KEY';
 
-const supabase =
-  isConfigured && window.supabase
-    ? window.supabase.createClient(config.url, config.anonKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false
-        }
-      })
-    : null;
-
-const readSupabaseError = (error) => {
-  if (!error) return 'Unknown error while saving the waitlist.';
-
-  if (error.message && /row-level security|permission denied|policy/i.test(error.message)) {
-    return 'Supabase is blocking the insert. Make sure the waitlist table has an insert policy for anonymous users.';
-  }
-
-  if (error.message && /does not exist|relation .* does not exist|table .* does not exist/i.test(error.message)) {
-    return 'The waitlist table does not exist yet. Run the SQL in Supabase first.';
-  }
-
-  return error.message || 'Something went wrong while joining the waitlist.';
-};
-
 const setStatus = (form, message, type = 'neutral') => {
   const statusEl = form.querySelector('.form-status');
   if (!statusEl) return;
@@ -51,29 +27,10 @@ const setStatus = (form, message, type = 'neutral') => {
 
 const submitToSupabase = async (email) => {
   if (!isConfigured) {
-    throw new Error('Supabase is not configured yet. Add your URL and anon key in script.js or set window.SUPABASE_URL / window.SUPABASE_ANON_KEY.');
+    throw new Error('Supabase URL and anon key are missing. Add them before testing the waitlist.');
   }
 
   const payload = { email: email.trim().toLowerCase() };
-
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.from('waitlist').insert([payload]).select();
-
-      if (error) {
-        if (error.code === '23505' || /duplicate|already exists/i.test(error.message)) {
-          throw new Error('You’re already on the waitlist.');
-        }
-
-        console.error('Supabase insert error:', error);
-        throw new Error(readSupabaseError(error));
-      }
-
-      return data;
-    } catch (error) {
-      console.warn('Supabase client insert failed, retrying with direct REST API.', error);
-    }
-  }
 
   const response = await fetch(`${config.url}/rest/v1/waitlist`, {
     method: 'POST',
@@ -102,7 +59,7 @@ const submitToSupabase = async (email) => {
     }
 
     if (/row-level security|policy|permission denied|does not exist/i.test(message)) {
-      throw new Error('Supabase is blocking the insert. Check the waitlist table and RLS policy in your project.');
+      throw new Error('Supabase is blocking the insert. Check the waitlist table and the insert policy in your project.');
     }
 
     throw new Error(message);
@@ -141,24 +98,27 @@ const handleFormSubmit = async (event) => {
   }
 };
 
-window.addEventListener('load', () => {
-  if (!window.supabase) {
-    document.querySelectorAll('.waitlist-form').forEach((form) => {
-      setStatus(form, 'Supabase script did not load. Check the CDN and project URL.', 'error');
-    });
-  }
-});
+const initWaitlistForms = () => {
+  document.querySelectorAll('.waitlist-form').forEach((form) => {
+    if (form.dataset.waitlistBound === 'true') return;
 
-document.querySelectorAll('.waitlist-form').forEach((form) => {
-  form.addEventListener('submit', handleFormSubmit);
+    form.dataset.waitlistBound = 'true';
+    form.addEventListener('submit', handleFormSubmit);
 
-  const status = document.createElement('p');
-  status.className = 'form-status';
-  status.setAttribute('aria-live', 'polite');
-  status.setAttribute('role', 'status');
-  form.appendChild(status);
+    const status = document.createElement('p');
+    status.className = 'form-status';
+    status.setAttribute('aria-live', 'polite');
+    status.setAttribute('role', 'status');
+    form.appendChild(status);
 
-  if (!isConfigured) {
-    setStatus(form, 'Add your Supabase URL and anon key before testing the form.', 'error');
-  }
-});
+    if (!isConfigured) {
+      setStatus(form, 'Add your Supabase URL and anon key before testing the form.', 'error');
+    }
+  });
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initWaitlistForms, { once: true });
+} else {
+  initWaitlistForms();
+}
