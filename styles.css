@@ -79,20 +79,31 @@ nav .wrap {
 }
 
 .logo {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  letter-spacing: -0.01em;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-family: 'Fraunces', Georgia, serif;
 }
 
-.logo-mark {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  background: var(--accent);
-  flex-shrink: 0;
+.brand-mark {
+  width: 54px;
+  height: 54px;
+  display: block;
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+}
+
+.logo-large {
+    height: 28px;
+    width: 28px;
+    margin-inline: 8px;
+}
+
+.logo-small {
+    height: 22px;
+    width: 22px;
+    margin-inline: 8px;
 }
 
 .nav-links {

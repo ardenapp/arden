@@ -119,7 +119,7 @@ const initWaitlistForms = () => {
     if (!isConfigured) {
       setStatus(form, 'Add your Supabase URL and anon key before testing the form.', 'error');
     } else {
-      setStatus(form, 'No spam. One email when Arden is ready to download.', 'neutral');
+      setStatus(form, 'No spam.', 'neutral');
     }
   });
 };
