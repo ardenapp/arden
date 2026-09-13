@@ -143,12 +143,16 @@ header.hero {
   margin: 0 auto 40px;
 }
 
+.waitlist-stack {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
 .waitlist-form {
   display: flex;
   justify-content: center;
   gap: 10px;
-  max-width: 420px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .waitlist-form input[type='email'] {
@@ -204,6 +208,7 @@ header.hero {
   margin-top: 14px;
   min-height: 18px;
   color: var(--text-tertiary);
+  text-align: center;
 }
 
 .form-note.is-error {

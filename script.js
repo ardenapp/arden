@@ -10,7 +10,7 @@ const isConfigured =
   config.anonKey !== 'YOUR_ANON_KEY';
 
 const setStatus = (form, message, type = 'neutral') => {
-  const noteEl = form.parentElement.querySelector('.form-note');
+  const noteEl = form.closest('.waitlist-stack')?.querySelector('.form-note');
   if (!noteEl) return;
 
   noteEl.textContent = message;
@@ -105,7 +105,8 @@ const initWaitlistForms = () => {
     form.dataset.waitlistBound = 'true';
     form.addEventListener('submit', handleFormSubmit);
 
-    let note = form.parentElement.querySelector('.form-note');
+    const stack = form.closest('.waitlist-stack');
+    let note = stack?.querySelector('.form-note');
     if (!note) {
       note = document.createElement('p');
       note.className = 'form-note';
