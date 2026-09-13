@@ -10,18 +10,18 @@ const isConfigured =
   config.anonKey !== 'YOUR_ANON_KEY';
 
 const setStatus = (form, message, type = 'neutral') => {
-  const statusEl = form.querySelector('.form-status');
-  if (!statusEl) return;
+  const noteEl = form.parentElement.querySelector('.form-note');
+  if (!noteEl) return;
 
-  statusEl.textContent = message;
-  statusEl.classList.remove('is-error', 'is-success');
+  noteEl.textContent = message;
+  noteEl.classList.remove('is-error', 'is-success');
 
   if (type === 'success') {
-    statusEl.classList.add('is-success');
+    noteEl.classList.add('is-success');
   }
 
   if (type === 'error') {
-    statusEl.classList.add('is-error');
+    noteEl.classList.add('is-error');
   }
 };
 
@@ -105,14 +105,20 @@ const initWaitlistForms = () => {
     form.dataset.waitlistBound = 'true';
     form.addEventListener('submit', handleFormSubmit);
 
-    const status = document.createElement('p');
-    status.className = 'form-status';
-    status.setAttribute('aria-live', 'polite');
-    status.setAttribute('role', 'status');
-    form.appendChild(status);
+    let note = form.parentElement.querySelector('.form-note');
+    if (!note) {
+      note = document.createElement('p');
+      note.className = 'form-note';
+      form.insertAdjacentElement('afterend', note);
+    }
+
+    note.setAttribute('aria-live', 'polite');
+    note.setAttribute('role', 'status');
 
     if (!isConfigured) {
       setStatus(form, 'Add your Supabase URL and anon key before testing the form.', 'error');
+    } else {
+      setStatus(form, 'No spam. One email when Arden is ready to download.', 'neutral');
     }
   });
 };

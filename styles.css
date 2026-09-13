@@ -199,26 +199,18 @@ header.hero {
   cursor: wait;
 }
 
-.form-note,
-.form-status {
+.form-note {
   font-size: 13px;
   margin-top: 14px;
-}
-
-.form-note {
+  min-height: 18px;
   color: var(--text-tertiary);
 }
 
-.form-status {
-  min-height: 18px;
-  color: var(--text-secondary);
-}
-
-.form-status.is-error {
+.form-note.is-error {
   color: #ff9c9c;
 }
 
-.form-status.is-success {
+.form-note.is-success {
   color: #b7e0ab;
 }
 
